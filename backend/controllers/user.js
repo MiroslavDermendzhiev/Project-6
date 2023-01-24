@@ -32,7 +32,7 @@ exports.login = (req, resp, next) => {
         });
       }
       bcrypt
-        .compare(req.body, password, user.password)
+        .compare(req.body.password, user.password)
         .then((valid) => {
           if (!valid) {
             return resp.status(401).json({
@@ -49,13 +49,13 @@ exports.login = (req, resp, next) => {
         })
         .catch((error) => {
           resp.status(500).json({
-            error: error,
+            error: error.message || error,
           });
         });
     })
     .catch((error) => {
       resp.status(500).json({
-        error: error,
+        error: error.message || error,
       });
     });
 };
