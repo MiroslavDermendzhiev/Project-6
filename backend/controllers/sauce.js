@@ -14,14 +14,20 @@ exports.findAll = (req, res, next) => {
 
 //new Sauce
 exports.newSauce = (req, resp, next) => {
-  const sauce = new sauceModels({
-    userId: req.body.userId,
-    name: req.body.name,
-    manufacturer: req.body.manufacturer,
-    description: req.body.description,
-    mainPepper: req.body.mainPepper,
-    imageUrl: req.body.imageUrl,
-    heat: req.body.heat,
+  const url = req.protocol + '://' + req.get('host');
+  const parsedSaucePayload = JSON.parse(req.body.sauce);
+  const sauce = new Sauce({
+    userId: parsedSaucePayload.userId,
+    name: parsedSaucePayload.name,
+    manufacturer: parsedSaucePayload.manufacturer,
+    description: parsedSaucePayload.description,
+    mainPepper: parsedSaucePayload.mainPepper,
+    imageUrl: url + '/images/' + req.file.filename,   // "TODO...",
+    heat: parsedSaucePayload.heat,
+    likes: 0,
+    dislikes: 0,
+    usersLiked: [],
+    usersDisliked: [],
   });
   sauce
     .save()

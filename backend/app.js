@@ -3,6 +3,7 @@
 const mongodbErrorHandler = require("mongoose-mongodb-errors");
 const express = require("express");
 const mongoose = require("mongoose");
+const path = require("path");
 const userRoutes = require("./routes/user");
 const sauceRoutes = require("./routes/sauce");
 const sauceModels = require("./models/sauce");
@@ -41,33 +42,9 @@ mongoose
 
 app.use(enableCors);
 app.use(express.json());
+app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use("/api/auth", userRoutes);
-// //new Sauce
-// app.post("/api/sauces", (req, resp, next) => {
-//   const sauce = new sauceModels({
-//     userId: req.body.userId,
-//     name: req.body.name,
-//     manufacturer: req.body.manufacturer,
-//     description: req.body.description,
-//     mainPepper: req.body.mainPepper,
-//     imageUrl: req.body.imageUrl,
-//     heat: req.body.heat,
-//   });
-//   sauce
-//     .save()
-//     .then(() => {
-//       resp.status(201).json({
-//         message: "Sauce saved successfully!",
-//       });
-//     })
-//     .catch((error) => {
-//       resp.status(400).json({
-//         error: error,
-//       });
-//     });
-// });
 
 app.use("/api/sauces", sauceRoutes);
 module.exports = app;
- 
