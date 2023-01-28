@@ -8,6 +8,12 @@ const auth = require("../middleware/auth");
 
 router.get("/", auth, sauceCtrl.findAll);
 //TODO add auth middleware for saving a sauce
-router.post("/",auth, multer, sauceCtrl.newSauce);
+router.post("/", auth, multer, sauceCtrl.newSauce);
+
+//update a sauce
+router.put("/:id", auth, multer, sauceCtrl.updateSauce);
+
+//delete a sauce
+router.delete('/:id', auth, sauceCtrl.deleteSauce);
 
 module.exports = router;

@@ -7,7 +7,7 @@ const path = require("path");
 const userRoutes = require("./routes/user");
 const sauceRoutes = require("./routes/sauce");
 const sauceModels = require("./models/sauce");
-const sauce = require("./models/sauce");
+const Sauce = require("./models/sauce");
 const app = express();
 const enableCors = (req, resp, next) => {
   resp.setHeader("Access-Control-Allow-Origin", "*");
@@ -42,9 +42,13 @@ mongoose
 
 app.use(enableCors);
 app.use(express.json());
+
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use("/api/auth", userRoutes);
 
 app.use("/api/sauces", sauceRoutes);
+
+app.use("/api/sauces/:id", sauceRoutes);
+
 module.exports = app;
