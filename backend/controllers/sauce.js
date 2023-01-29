@@ -116,3 +116,58 @@ exports.deleteSauce = (req, res, next) => {
     });
   });
 };
+
+//like, dislike sauces
+
+exports.likeSauce = (req, res, next) => {
+  const liker = req.body.userId;
+  let likeStatus = req.body.like;
+  sauce
+    .findOne({ _id: req.params.id })
+    .then((votedSauce) => {
+      if (likeStatus === 1) {
+        sauce
+          .updateOne(
+            { _id: req.params.id },
+            { $push: { usersLiked: liker }, $inc: { likes: 1 } }
+          )
+          .then(() =>
+            res.status(201).json({ message: "You liked this sauce!" })
+          )
+          .catch((error) => res.status(400).json({ error }));
+      } else if (likeStatus === -1) {
+        sauce
+          .updateOne(
+            { _id: req.params.id },
+            { $inc: { dislikes: 1 }, $push: { usersDisliked: liker } }
+          )
+          .then(() =>
+            res.status(201).json({ message: "You disliked this sauce!" })
+          )
+          .catch((error) => res.status(400).json({ error }));
+      } else if (likeStatus === 0) {
+        if (votedSauce.usersLiked.includes(liker)) {
+          sauce
+            .updateSauce(
+              { _id: req.params.id },
+              { $inc: { likes: -1 }, $pull: { usersLiked: liker } }
+            )
+            .then(() =>
+              res.status(201).json({ message: "You un-liked this sauce!" })
+            )
+            .catch((error) => res.status(400).json({ error }));
+        } else if (votedSauce.usersDisliked.includes(liker)) {
+          sauce
+            .updateOne(
+              { _id: req.params.id },
+              { $inc: { dislikes: -1 }, $pull: { usersDisliked: liker } }
+            )
+            .then(() =>
+              res.status(201).json({ message: "You un-disliked this sauce!" })
+            )
+            .catch((error) => res.status(400).json({ error }));
+        }
+      }
+    })
+    .catch((error) => res.status(400).json({ error }));
+};
