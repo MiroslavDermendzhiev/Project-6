@@ -1,6 +1,5 @@
 const Sauce = require("../models/sauce");
 const fs = require("fs");
-const sauce = require("../models/sauce");
 
 exports.findAll = (req, res, next) => {
   Sauce.find()
@@ -14,9 +13,18 @@ exports.findAll = (req, res, next) => {
     });
 };
 
+//TODO find one sauce
+exports.findOne = (req, res, next) => {
+  res
+    .status(418)
+    .json({ error: `TODO: find the sauce for id = ${req.params.id}` });
+  //  Sauce
+  //    .findOne({ _id: req.params.id })
+};
+
 //new Sauce
 exports.newSauce = (req, resp, next) => {
-  const url = req.protocol + "://" + req.get("host");
+  const url = `${req.protocol}://${req.get("host")}`;
   const parsedSaucePayload = JSON.parse(req.body.sauce);
   const sauce = new Sauce({
     userId: parsedSaucePayload.userId,
@@ -24,7 +32,7 @@ exports.newSauce = (req, resp, next) => {
     manufacturer: parsedSaucePayload.manufacturer,
     description: parsedSaucePayload.description,
     mainPepper: parsedSaucePayload.mainPepper,
-    imageUrl: url + "/images/" + parsedSaucePayload.filename, // "TODO...",
+    imageUrl: url + "/images/" + req.file.filename,
     heat: parsedSaucePayload.heat,
     likes: 0,
     dislikes: 0,
@@ -122,51 +130,49 @@ exports.deleteSauce = (req, res, next) => {
 exports.likeSauce = (req, res, next) => {
   const liker = req.body.userId;
   let likeStatus = req.body.like;
-  sauce
-    .findOne({ _id: req.params.id })
+  Sauce.findOne({ _id: req.params.id })
     .then((votedSauce) => {
       if (likeStatus === 1) {
-        sauce
-          .updateOne(
-            { _id: req.params.id },
-            { $push: { usersLiked: liker }, $inc: { likes: 1 } }
-          )
+        //FIXME check first if the user already liked the sauce
+        Sauce.updateOne(
+          { _id: req.params.id },
+          { $push: { usersLiked: liker }, $inc: { likes: 1 } }
+        )
           .then(() =>
             res.status(201).json({ message: "You liked this sauce!" })
           )
           .catch((error) => res.status(400).json({ error }));
       } else if (likeStatus === -1) {
-        sauce
-          .updateOne(
-            { _id: req.params.id },
-            { $inc: { dislikes: 1 }, $push: { usersDisliked: liker } }
-          )
+        //FIXME check first to see if the user already disliked the sauce
+        Sauce.updateOne(
+          { _id: req.params.id },
+          { $inc: { dislikes: 1 }, $push: { usersDisliked: liker } }
+        )
           .then(() =>
             res.status(201).json({ message: "You disliked this sauce!" })
           )
           .catch((error) => res.status(400).json({ error }));
       } else if (likeStatus === 0) {
         if (votedSauce.usersLiked.includes(liker)) {
-          sauce
-            .updateSauce(
-              { _id: req.params.id },
-              { $inc: { likes: -1 }, $pull: { usersLiked: liker } }
-            )
+          Sauce.updateOne(
+            { _id: req.params.id },
+            { $inc: { likes: -1 }, $pull: { usersLiked: liker } }
+          )
             .then(() =>
               res.status(201).json({ message: "You un-liked this sauce!" })
             )
             .catch((error) => res.status(400).json({ error }));
         } else if (votedSauce.usersDisliked.includes(liker)) {
-          sauce
-            .updateOne(
-              { _id: req.params.id },
-              { $inc: { dislikes: -1 }, $pull: { usersDisliked: liker } }
-            )
+          Sauce.updateOne(
+            { _id: req.params.id },
+            { $inc: { dislikes: -1 }, $pull: { usersDisliked: liker } }
+          )
             .then(() =>
               res.status(201).json({ message: "You un-disliked this sauce!" })
             )
             .catch((error) => res.status(400).json({ error }));
         }
+        //FIXME what if the liker is not in either the likes or dislikes arrays?
       }
     })
     .catch((error) => res.status(400).json({ error }));
