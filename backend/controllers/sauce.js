@@ -15,15 +15,17 @@ exports.findAll = (req, res, next) => {
 
 //TODO find one sauce
 exports.findOne = (req, res, next) => {
-  res
-    .status(418)
-    .json({ error: `TODO: find the sauce for id = ${req.params.id}` });
-  //  Sauce
-  //    .findOne({ _id: req.params.id })
+  //TODO declare variable for sauce id (from request parametars)
+  console.log(req.params.id);
+  //TODO use mongoose to get the sauce from the id
+  Sauce.findOne({ _id: req.params.id }).then((sauce) => {
+    res.status(200).json(sauce);
+  });
+  //TODO sent sauce infromation back in the response with status code 200
 };
 
 //new Sauce
-exports.newSauce = (req, resp, next) => {
+exports.newSauce = (req, res, next) => {
   const url = `${req.protocol}://${req.get("host")}`;
   const parsedSaucePayload = JSON.parse(req.body.sauce);
   const sauce = new Sauce({
@@ -42,12 +44,12 @@ exports.newSauce = (req, resp, next) => {
   sauce
     .save()
     .then(() => {
-      resp.status(201).json({
+      res.status(201).json({
         message: "Sauce saved successfully!",
       });
     })
     .catch((error) => {
-      resp.status(400).json({
+      res.status(400).json({
         error: error,
       });
     });
@@ -92,12 +94,12 @@ exports.updateSauce = (req, res, next) => {
 
   Sauce.updateOne({ _id: req.params.id }, sauce)
     .then(() => {
-      resp.status(201).json({
+      res.status(201).json({
         message: "Sauce updated successfully!",
       });
     })
     .catch((error) => {
-      resp.status(400),
+      res.status(400),
         json({
           error: error,
         });
