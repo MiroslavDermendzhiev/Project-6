@@ -1,5 +1,4 @@
 const express = require("express");
-const { isParameter } = require("typescript");
 const router = express.Router();
 const multer = require("../middleware/multer-config");
 const sauceCtrl = require("../controllers/sauce");
@@ -10,7 +9,7 @@ router.get("/", auth, sauceCtrl.findAll);
 
 router.post("/", auth, multer, sauceCtrl.newSauce);
 
-router.get("/:id", auth, sauceCtrl.findOne);
+router.get("/:id", auth, sauceCtrl.findOne); // we use ":" to express that the id is going to be a dinamic parameter
 //update a sauce
 router.put("/:id", auth, multer, sauceCtrl.updateSauce);
 

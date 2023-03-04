@@ -1,6 +1,6 @@
 const Sauce = require("../models/sauce");
 const fs = require("fs");
-
+//show all sauces
 exports.findAll = (req, res, next) => {
   Sauce.find()
     .then((sauces) => {
@@ -13,18 +13,16 @@ exports.findAll = (req, res, next) => {
     });
 };
 
-//TODO find one sauce
+//find one sauce
 exports.findOne = (req, res, next) => {
-  //TODO declare variable for sauce id (from request parametars)
   console.log(req.params.id);
-  //TODO use mongoose to get the sauce from the id
+
   Sauce.findOne({ _id: req.params.id }).then((sauce) => {
     res.status(200).json(sauce);
   });
-  //TODO sent sauce infromation back in the response with status code 200
 };
 
-//new Sauce
+//create new Sauce
 exports.newSauce = (req, res, next) => {
   const url = `${req.protocol}://${req.get("host")}`;
   const parsedSaucePayload = JSON.parse(req.body.sauce);
@@ -42,14 +40,18 @@ exports.newSauce = (req, res, next) => {
     usersDisliked: [],
   });
   sauce
-    .save()
+    .save() // method tah we use to save the data to the database; save method returns a promise
     .then(() => {
+      //promise, that sends the responce back to the frontend
       res.status(201).json({
+        //201 created
         message: "Sauce saved successfully!",
       });
     })
     .catch((error) => {
+      //catching any errors
       res.status(400).json({
+        //400 bad request error
         error: error,
       });
     });
@@ -68,7 +70,7 @@ exports.updateSauce = (req, res, next) => {
       manufacturer: parsedSaucePayload.manufacturer,
       description: parsedSaucePayload.description,
       mainPepper: parsedSaucePayload.mainPepper,
-      imageUrl: url + "/images/" + parsedSaucePayload.filename, // "TODO...",
+      imageUrl: url + "/images/" + req.file.filename,
       heat: parsedSaucePayload.heat,
       likes: 0,
       dislikes: 0,
@@ -83,7 +85,7 @@ exports.updateSauce = (req, res, next) => {
       manufacturer: req.body.manufacturer,
       description: req.body.description,
       mainPepper: req.body.mainPepper,
-      imageUrl: url + "/images/" + req.file.filename, // "TODO...",
+      imageUrl: url + "/images/" + req.file.filename,
       heat: req.body.heat,
       likes: 0,
       dislikes: 0,
@@ -107,7 +109,6 @@ exports.updateSauce = (req, res, next) => {
 };
 
 // delete sauce
-
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id }).then((sauce) => {
     const filename = sauce.imageUrl.split("/images/")[1];
@@ -128,14 +129,12 @@ exports.deleteSauce = (req, res, next) => {
 };
 
 //like, dislike sauces
-
 exports.likeSauce = (req, res, next) => {
   const liker = req.body.userId;
   let likeStatus = req.body.like;
   Sauce.findOne({ _id: req.params.id })
     .then((votedSauce) => {
       if (likeStatus === 1) {
-        //FIXME check first if the user already liked the sauce
         Sauce.updateOne(
           { _id: req.params.id },
           { $push: { usersLiked: liker }, $inc: { likes: 1 } }
@@ -145,7 +144,6 @@ exports.likeSauce = (req, res, next) => {
           )
           .catch((error) => res.status(400).json({ error }));
       } else if (likeStatus === -1) {
-        //FIXME check first to see if the user already disliked the sauce
         Sauce.updateOne(
           { _id: req.params.id },
           { $inc: { dislikes: 1 }, $push: { usersDisliked: liker } }
@@ -174,7 +172,6 @@ exports.likeSauce = (req, res, next) => {
             )
             .catch((error) => res.status(400).json({ error }));
         }
-        //FIXME what if the liker is not in either the likes or dislikes arrays?
       }
     })
     .catch((error) => res.status(400).json({ error }));

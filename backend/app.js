@@ -1,5 +1,3 @@
-// cluster pass: BdICbIAkRW4YNSeJ
-//connection string: mongodb+srv://MiroBeroe:<password>@cluster0.vmtbfnm.mongodb.net/?retryWrites=true&w=majority
 const mongodbErrorHandler = require("mongoose-mongodb-errors");
 const express = require("express");
 const mongoose = require("mongoose");
@@ -36,11 +34,6 @@ mongoose
     console.error(error);
   });
 
-// app.use((req, resp, next) => {
-//   resp.status(201);
-//   next();
-// });
-
 app.use(enableCors);
 app.use(express.json());
 
@@ -49,7 +42,5 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 app.use("/api/auth", userRoutes);
 
 app.use("/api/sauces", sauceRoutes);
-
-app.use("/api/sauces/:id", sauceRoutes);
 
 module.exports = app;
